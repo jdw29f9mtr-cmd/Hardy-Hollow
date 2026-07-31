@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#2a1a0e" />
+  <title>Hardy Hollow</title>
+  <style>
+    :root {
+      --bg-dark: #1a120b;
+      --bg-card: #2a1f14;
+      --bg-region: #3a2a1a;
+      --gold: #e8b84a;
+      --gold-light: #f5d78a;
+      --green: #5cb85c;
+      --purple: #9b59b6;
+      --text: #f5e6c8;
+      --text-dim: #c4a77d;
+      --border: #5a4030;
+      --heart-dim: #6b3a3a;
+      --heart-mid: #c45c5c;
+      --heart-bright: #ff6b6b;
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark); color: var(--text); user-select: none;
+    }
+    .splash {
+      position: fixed; inset: 0;
+      background: linear-gradient(180deg, #1a120b 0%, #3a2410 50%, #1a120b 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+      transition: opacity 0.6s ease;
+    }
+    .splash.hidden { opacity: 0; pointer-events: none; }
+    .splash-content { text-align: center; padding: 2rem; }
+    .pixel-heart { font-size: 4rem; color: var(--heart-mid); animation: pulse 1.5s ease-in-out infinite; margin-bottom: 1rem; }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.15);opacity:1} }
+    .title { font-size: 1.6rem; font-weight: 800; color: var(--gold); text-shadow: 2px 2px 0 #5a3a10; margin-bottom: .5rem; letter-spacing: 1px; }
+    .subtitle { color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem; }
+    .app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; background: var(--bg-dark); position: relative; }
+    .app.hidden { display: none; }
+    .status-bar { display: flex; justify-content: space-between; padding: 8px 16px 4px; padding-top: calc(var(--safe-top) + 4px); font-size: .75rem; color: var(--text-dim); background: rgba(0,0,0,.3); }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: linear-gradient(180deg,#2a1f14,#1a120b); border-bottom: 2px solid var(--border); }
+    .logo { font-size: .85rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
+    .team-points { font-size: .85rem; color: var(--gold-light); background: rgba(232,184,74,.15); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--gold); }
+    .screens { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 80px; -webkit-overflow-scrolling: touch; }
+    .screen { display: none; padding: 16px; animation: fadeIn .3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .section-title { font-size: .8rem; font-weight: 800; color: var(--gold); margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; }
+    .map-container { display: flex; flex-direction: column; gap: 16px; }
+    .heart-container { text-align: center; padding: 20px; background: var(--bg-card); border-radius: 16px; border: 2px solid var(--border); }
+    .heart { font-size: 3.5rem; transition: all .8s ease; line-height: 1; }
+    .heart.dim { color: var(--heart-dim); filter: grayscale(.6); }
+    .heart.mid { color: var(--heart-mid); }
+    .heart.bright { color: var(--heart-bright); text-shadow: 0 0 20px var(--heart-bright); animation: pulse 2s infinite; }
+    .heart-label { font-size: .9rem; color: var(--text-dim); margin-top: 4px; }
+    .heart-progress { font-size: .85rem; font-weight: 700; color: var(--gold); margin-top: 8px; }
+    .regions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .region { background: var(--bg-region); border: 2px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; transition: all .3s ease; }
+    .region.healed { border-color: var(--green); background: #2a3a20; }
+    .region-icon { font-size: 1.8rem; margin-bottom: 4px; }
+    .region-name { font-size: .8rem; font-weight: 700; color: var(--text); }
+    .region-status { font-size: .7rem; color: var(--text-dim); margin-top: 2px; }
+    .region.healed .region-status { color: var(--green); }
+    .story-box { background: rgba(0,0,0,.35); border-left: 4px solid var(--gold); padding: 12px 14px; border-radius: 0 10px 10px 0; font-size: .85rem; line-height: 1.45; color: var(--text-dim); }
+    .quest-list { display: flex; flex-direction: column; gap: 12px; }
+    .quest-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .quest-card.boss { border-color: var(--purple); background: linear-gradient(135deg,#2a1f14,#3a2040); }
+    .quest-card.pending { border-color: var(--gold); opacity: .85; }
+    .quest-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .quest-name { font-weight: 800; font-size: 1rem; color: var(--gold-light); }
+    .quest-diff { font-size: .75rem; color: var(--gold); }
+    .quest-flavor { font-size: .8rem; color: var(--text-dim); line-height: 1.35; }
+    .quest-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+    .quest-reward { font-size: .75rem; font-weight: 700; color: var(--green); background: rgba(92,184,92,.15); padding: 4px 8px; border-radius: 8px; }
+    .quest-btn { font-size: .8rem; padding: 6px 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; background: var(--gold); color: #1a120b; }
+    .quest-btn:disabled { background: #555; color: #999; }
+    .heroes-grid { display: flex; flex-direction: column; gap: 14px; }
+    .hero-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; }
+    .hero-avatar { font-size: 3rem; margin-bottom: 6px; }
+    .hero-name { font-weight: 800; font-size: 1.1rem; color: var(--gold-light); }
+    .hero-title { font-size: .8rem; color: var(--purple); margin-bottom: 8px; }
+    .hero-points { font-size: .9rem; font-weight: 700; color: var(--green); margin-bottom: 10px; }
+    .progress-bar { height: 10px; background: #1a120b; border-radius: 5px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 6px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--gold-light)); border-radius: 5px; transition: width .6s ease; }
+    .progress-label { font-size: .7rem; color: var(--text-dim); }
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+    .badge { background: rgba(232,184,74,.2); border: 1px solid var(--gold); border-radius: 20px; padding: 3px 8px; font-size: .65rem; color: var(--gold); }
+    .titles-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .title-chip { background: var(--bg-region); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: .75rem; color: var(--text-dim); }
+    .title-chip.earned { border-color: var(--purple); color: var(--gold-light); background: rgba(155,89,182,.2); }
+    .bank-header { text-align: center; padding: 20px; background: var(--bg-card); border-radius: 16px; border: 2px solid var(--gold); margin-bottom: 16px; }
+    .bank-icon { font-size: 2.5rem; }
+    .bank-title { font-size: .85rem; font-weight: 800; color: var(--gold); margin: 8px 0; }
+    .bank-total { font-size: 1.8rem; font-weight: 800; color: var(--gold-light); }
+    .bank-label { font-size: .8rem; color: var(--text-dim); }
+    .bank-progress-wrap { margin-bottom: 20px; }
+    .bank-progress-bar { height: 14px; background: #1a120b; border-radius: 7px; overflow: hidden; border: 1px solid var(--border); }
+    .bank-progress-fill { height: 100%; background: linear-gradient(90deg,#5cb85c,#e8b84a); transition: width .6s ease; }
+    .bank-next { font-size: .75rem; color: var(--text-dim); text-align: center; margin-top: 6px; }
+    .rewards-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .reward-item { display: flex; align-items: center; gap: 12px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px; padding: 12px; }
+    .reward-item.unlocked { border-color: var(--green); background: #1f2e1a; }
+    .reward-icon { font-size: 1.6rem; }
+    .reward-info { flex: 1; }
+    .reward-name { font-weight: 700; font-size: .95rem; }
+    .reward-cost { font-size: .75rem; color: var(--text-dim); }
+    .reward-status { font-size: .7rem; font-weight: 700; color: var(--text-dim); }
+    .reward-item.unlocked .reward-status { color: var(--green); }
+    .log-list { font-size: .8rem; color: var(--text-dim); line-height: 1.5; }
+    .parent-lock { text-align: center; padding: 40px 20px; }
+    .lock-icon { font-size: 3rem; margin-bottom: 12px; }
+    .lock-title { font-size: 1rem; font-weight: 800; color: var(--gold); margin-bottom: 8px; }
+    #pin-input { display: block; width: 140px; margin: 16px auto; padding: 12px; font-size: 1.4rem; text-align: center; letter-spacing: 8px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 10px; color: var(--text); outline: none; }
+    #pin-input:focus { border-color: var(--gold); }
+    .pin-hint { font-size: .75rem; color: var(--text-dim); margin-top: 12px; }
+    .parent-panel { padding-top: 8px; }
+    .pending-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; min-height: 40px; }
+    .pending-item { background: var(--bg-card); border: 2px solid var(--gold); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .pending-info { flex: 1; }
+    .pending-name { font-weight: 700; color: var(--gold-light); }
+    .pending-meta { font-size: .75rem; color: var(--text-dim); }
+    .parent-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .title-award { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .title-award select { flex: 1; min-width: 120px; padding: 10px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; color: var(--text); font-size: .9rem; }
+    .pixel-btn { font-weight: 800; font-size: .95rem; padding: 12px 20px; border: none; border-radius: 12px; cursor: pointer; transition: transform .1s ease; }
+    .pixel-btn:active { transform: scale(.96); }
+    .pixel-btn.primary { background: linear-gradient(180deg,var(--gold-light),var(--gold)); color: #1a120b; box-shadow: 0 4px 0 #a07820; }
+    .pixel-btn.secondary { background: var(--bg-region); color: var(--text); border: 2px solid var(--border); }
+    .pixel-btn.danger { background: #5a2020; color: #ffaaaa; border: 2px solid #8a3030; }
+    .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; background: #1a120b; border-top: 2px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 100; }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0 8px; background: none; border: none; color: var(--text-dim); font-size: .65rem; cursor: pointer; }
+    .tab.active { color: var(--gold); }
+    .tab-icon { font-size: 1.35rem; }
+    .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 2px solid var(--gold); color: var(--gold-light); padding: 10px 18px; border-radius: 20px; font-weight: 700; font-size: .9rem; z-index: 2000; box-shadow: 0 8px 24px rgba(0,0,0,.5); transition: opacity .3s, transform .3s; }
+    .toast.hidden { opacity: 0; transform: translateX(-50%) translateY(-20px); pointer-events: none; }
+    .celebration { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+    .celebration.hidden { display: none; }
+    .celeb-content { background: var(--bg-card); border: 3px solid var(--gold); border-radius: 20px; padding: 28px 24px; text-align: center; max-width: 300px; animation: popIn .4s ease; }
+    @keyframes popIn { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+    .celeb-icon { font-size: 3rem; margin-bottom: 8px; }
+    .celeb-title { font-size: 1rem; font-weight: 800; color: var(--gold); margin-bottom: 10px; }
+    .celeb-msg { font-size: .95rem; color: var(--text); margin-bottom: 18px; line-height: 1.4; white-space: pre-line; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 2500; padding: 20px; }
+    .modal.hidden { display: none; }
+    .modal-content { background: var(--bg-card); border: 2px solid var(--border); border-radius: 18px; padding: 24px; max-width: 320px; width: 100%; text-align: center; }
+    .modal-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .modal-title { font-weight: 800; font-size: 1.15rem; color: var(--gold-light); margin-bottom: 8px; }
+    .modal-flavor { font-size: .85rem; color: var(--text-dim); margin-bottom: 12px; line-height: 1.4; }
+    .modal-reward { font-size: .85rem; font-weight: 700; color: var(--green); margin-bottom: 18px; }
+    .modal-actions { display: flex; flex-direction: column; gap: 8px; }
+    .empty { text-align: center; color: var(--text-dim); padding: 20px; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="pixel-heart">&#9829;</div>
+      <h1 class="title">HARDY HOLLOW</h1>
+      <p class="subtitle">The Kingdom Needs Heroes</p>
+      <button id="start-btn" class="pixel-btn primary">Begin Adventure</button>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <div class="status-bar">
+      <span class="time" id="status-time">9:41</span>
+      <span class="battery">&#9646;&#9646;&#9646;</span>
+    </div>
+    <header class="header">
+      <div class="header-left"><span class="logo">HARDY HOLLOW</span></div>
+      <div class="header-right"><span class="team-points" id="team-points-display">Kingdom: 0</span></div>
+    </header>
+
+    <main class="screens">
+      <section id="screen-map" class="screen active">
+        <div class="map-container">
+          <div class="heart-container">
+            <div id="heart" class="heart dim">&#9829;</div>
+            <div class="heart-label">Heart of Helping</div>
+            <div class="heart-progress" id="heart-progress">0% restored</div>
+          </div>
+          <div class="regions">
+            <div class="region" data-region="playroom"><div class="region-icon">&#129513;</div><div class="region-name">Playroom Forest</div><div class="region-status" id="status-playroom">Gloomy</div></div>
+            <div class="region" data-region="kitchen"><div class="region-icon">&#127869;</div><div class="region-name">Kitchen Kingdom</div><div class="region-status" id="status-kitchen">Gloomy</div></div>
+            <div class="region" data-region="laundry"><div class="region-icon">&#128085;</div><div class="region-name">Laundry Mountains</div><div class="region-status" id="status-laundry">Gloomy</div></div>
+            <div class="region" data-region="bedroom"><div class="region-icon">&#128719;</div><div class="region-name">Bedroom Barracks</div><div class="region-status" id="status-bedroom">Gloomy</div></div>
+          </div>
+          <div class="story-box">Lord Clutter has stolen the Heart of Helping. Only Hudson the Brave and Camille the Clever can restore the kingdom... one quest at a time.</div>
+        </div>
+      </section>
+
+      <section id="screen-quests" class="screen">
+        <div class="section-title">Available Quests</div>
+        <div id="quest-list" class="quest-list"></div>
+      </section>
+
+      <section id="screen-heroes" class="screen">
+        <div class="heroes-grid">
+          <div class="hero-card">
+            <div class="hero-avatar">&#129490;</div>
+            <div class="hero-name">Hudson the Brave</div>
+            <div class="hero-title" id="hudson-title">Hardy Helper</div>
+            <div class="hero-points"><span id="hudson-points">0</span> HHP</div>
+            <div class="progress-bar"><div class="progress-fill" id="hudson-progress" style="width:0%"></div></div>
+            <div class="progress-label" id="hudson-next">Next: Helpful Hero Badge</div>
+            <div class="badges" id="hudson-badges"></div>
+          </div>
+          <div class="hero-card">
+            <div class="hero-avatar">&#128103;</div>
+            <div class="hero-name">Camille the Clever</div>
+            <div class="hero-title" id="camille-title">Hardy Helper</div>
+            <div class="hero-points"><span id="camille-points">0</span> HHP</div>
+            <div class="progress-bar"><div class="progress-fill" id="camille-progress" style="width:0%"></div></div>
+            <div class="progress-label" id="camille-next">Next: Helpful Hero Badge</div>
+            <div class="badges" id="camille-badges"></div>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <div class="section-title">Special Titles</div>
+          <div id="titles-list" class="titles-list"></div>
+        </div>
+      </section>
+
+      <section id="screen-bank" class="screen">
+        <div class="bank-header">
+          <div class="bank-icon">&#127984;</div>
+          <div class="bank-title">Kingdom Bank</div>
+          <div class="bank-total" id="bank-total">0</div>
+          <div class="bank-label">Team Points</div>
+        </div>
+        <div class="bank-progress-wrap">
+          <div class="bank-progress-bar"><div class="bank-progress-fill" id="bank-progress" style="width:0%"></div></div>
+          <div class="bank-next" id="bank-next">Next unlock at 2,000</div>
+        </div>
+        <div class="rewards-list" id="rewards-list"></div>
+        <div>
+          <div class="section-title">Recent Teamwork</div>
+          <div id="teamwork-log" class="log-list"></div>
+        </div>
+      </section>
+
+      <section id="screen-parent" class="screen">
+        <div id="parent-lock" class="parent-lock">
+          <div class="lock-icon">&#128274;</div>
+          <div class="lock-title">Parent Zone</div>
+          <p>Enter PIN to continue</p>
+          <input type="password" id="pin-input" maxlength="4" placeholder="••••" inputmode="numeric" />
+          <button id="pin-submit" class="pixel-btn primary">Unlock</button>
+          <p class="pin-hint">Default PIN: 1234</p>
+        </div>
+        <div id="parent-panel" class="parent-panel hidden">
+          <div class="section-title">Pending Approvals</div>
+          <div id="pending-list" class="pending-list"></div>
+          <div class="parent-actions">
+            <button id="power-up-btn" class="pixel-btn secondary">Parent Power-Up</button>
+            <button id="add-custom-btn" class="pixel-btn secondary">Custom Quest</button>
+            <button id="reset-btn" class="pixel-btn danger">Reset Demo Data</button>
+          </div>
+          <div class="section-title">Award Special Title</div>
+          <div class="title-award">
+            <select id="title-hero"><option value="hudson">Hudson</option><option value="camille">Camille</option></select>
+            <select id="title-select">
+              <option>Laundry Legend</option><option>Toy Tamer</option><option>Crumb Crusher</option>
+              <option>Dust Destroyer</option><option>Sock Savior</option><option>Bed-Making Baron</option>
+              <option>Tidy Titan</option><option>Dish Dragon</option>
+            </select>
+            <button id="award-title-btn" class="pixel-btn primary">Award</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tab-bar">
+      <button class="tab active" data-screen="map"><span class="tab-icon">&#128506;</span><span class="tab-label">Map</span></button>
+      <button class="tab" data-screen="quests"><span class="tab-icon">&#9876;</span><span class="tab-label">Quests</span></button>
+      <button class="tab" data-screen="heroes"><span class="tab-icon">&#128170;</span><span class="tab-label">Heroes</span></button>
+      <button class="tab" data-screen="bank"><span class="tab-icon">&#127984;</span><span class="tab-label">Bank</span></button>
+      <button class="tab" data-screen="parent"><span class="tab-icon">&#128274;</span><span class="tab-label">Parent</span></button>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="celebration" class="celebration hidden">
+    <div class="celeb-content">
+      <div class="celeb-icon">&#127881;</div>
+      <div class="celeb-title" id="celeb-title">Quest Complete!</div>
+      <div class="celeb-msg" id="celeb-msg"></div>
+      <button id="celeb-close" class="pixel-btn primary">Awesome!</button>
+    </div>
+  </div>
+
+  <div id="quest-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-icon" id="modal-icon">&#9876;</div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-flavor" id="modal-flavor"></div>
+      <div class="modal-reward" id="modal-reward"></div>
+      <div class="modal-actions">
+        <button id="modal-accept" class="pixel-btn primary">Accept Quest</button>
+        <button id="modal-cancel" class="pixel-btn secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PIN = "1234";
+    const QUESTS = [
+      { id: "bed", name: "Defeat the Blanket Beast", flavor: "Make your bed and restore order to the Bedroom Barracks!", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { id: "hamper", name: "Banish the Laundry Goblins", flavor: "Put all dirty clothes in the hamper.", points: 300, difficulty: "*", region: "laundry", type: "easy" },
+      { id: "table", name: "Scatter Captain Crumbs Minions", flavor: "Clear your place at the table after a meal.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { id: "toys", name: "Toy Takedown", flavor: "Return every toy to its proper home in the Playroom Forest.", points: 400, difficulty: "**", region: "playroom", type: "easy" },
+      { id: "wipe", name: "Polish the Royal Feast Board", flavor: "Wipe the table until it shines.", points: 450, difficulty: "**", region: "kitchen", type: "easy" },
+      { id: "load-dish", name: "Feed the Sink Serpent", flavor: "Load the dishwasher with the day's dishes.", points: 600, difficulty: "**", region: "kitchen", type: "medium" },
+      { id: "unload-dish", name: "Tame the Sink Serpent", flavor: "Unload the clean dishwasher and put everything away.", points: 650, difficulty: "**", region: "kitchen", type: "medium" },
+      { id: "fold", name: "Conquer Laundry Mountain", flavor: "Fold a full basket of clean laundry.", points: 800, difficulty: "***", region: "laundry", type: "medium" },
+      { id: "sweep", name: "Crush the Crumb Trolls", flavor: "Sweep the kitchen floor clean of all crumbs.", points: 700, difficulty: "**", region: "kitchen", type: "medium" },
+      { id: "surfaces", name: "Banish Bedroom Clutter Sprites", flavor: "Tidy all surfaces in your bedroom.", points: 750, difficulty: "**", region: "bedroom", type: "medium" },
+      { id: "playroom-boss", name: "Defeat Lord Clutter", flavor: "Clean the entire Playroom Forest. No toy left behind!", points: 2000, difficulty: "****", region: "playroom", type: "boss" },
+      { id: "kitchen-boss", name: "Vanquish Captain Crumbs", flavor: "Full Kitchen Reset: clear, load, wipe and sweep.", points: 1800, difficulty: "****", region: "kitchen", type: "boss" },
+      { id: "laundry-boss", name: "Dethrone Queen Laundry", flavor: "Fold and put away ALL the laundry.", points: 2200, difficulty: "****", region: "laundry", type: "boss" },
+      { id: "dust-boss", name: "Slay the Dust Bunny King", flavor: "Dust all the furniture in one room.", points: 1500, difficulty: "***", region: "bedroom", type: "boss" }
+    ];
+    const REWARDS = [
+      { id: "movie", name: "Family Movie Night", cost: 2000, icon: "P" },
+      { id: "icecream", name: "Ice-Cream Outing", cost: 5000, icon: "I" },
+      { id: "late", name: "Stay-Up-Late Pass", cost: 5000, icon: "L" },
+      { id: "saturday", name: "Choose Saturday Activity", cost: 10000, icon: "S" },
+      { id: "boardgame", name: "New Family Board Game", cost: 10000, icon: "B" },
+      { id: "adventure", name: "Big Adventure (Zoo / Camping)", cost: 20000, icon: "A" }
+    ];
+    const TITLES = ["Laundry Legend", "Toy Tamer", "Crumb Crusher", "Dust Destroyer", "Sock Savior", "Bed-Making Baron", "Tidy Titan", "Dish Dragon"];
+
+    let state = {
+      hudson: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
+      camille: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
+      teamBank: 0,
+      pending: [],
+      teamworkLog: [],
+      regions: { playroom: 0, kitchen: 0, laundry: 0, bedroom: 0 },
+      totalHelps: 0
+    };
+
+    function loadState() {
+      try {
+        var s = localStorage.getItem("hardyHollow");
+        if (s) {
+          var parsed = JSON.parse(s);
+          state.hudson = parsed.hudson || state.hudson;
+          state.camille = parsed.camille || state.camille;
+          state.teamBank = parsed.teamBank || 0;
+          state.pending = parsed.pending || [];
+          state.teamworkLog = parsed.teamworkLog || [];
+          state.regions = parsed.regions || state.regions;
+          state.totalHelps = parsed.totalHelps || 0;
+        }
+      } catch (e) {}
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("hardyHollow", JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function getRank(hero) {
+      var h = state[hero];
+      if (h.helmets >= 3) return "Hardy Hollow Legend";
+      if (h.helmets >= 1) return "Hall-of-Fame Hero";
+      if (h.trophies >= 1) return "Household Hero";
+      if (h.badges >= 1) return "Helpful Hero";
+      return "Hardy Helper";
+    }
+
+    function getProgress(hero) {
+      var h = state[hero];
+      var toward = h.points % 1000;
+      var pct = (toward / 1000) * 100;
+      var next = "Helpful Hero Badge";
+      if (h.badges >= 3 && h.trophies < 3) next = "Household Hero Trophy";
+      else if (h.trophies >= 3 && h.helmets < 3) next = "Hardy Hall-of-Fame Helmet";
+      else if (h.helmets >= 3) next = "Legend status achieved!";
+      else if (h.badges > 0) next = (3 - (h.badges % 3)) + " more badges -> Trophy";
+      return { pct: pct, next: next };
+    }
+
+    function checkMilestones(hero) {
+      var h = state[hero];
+      var msgs = [];
+      var expected = Math.floor(h.points / 1000);
+      while (h.badges < expected) {
+        h.badges++;
+        msgs.push("Helpful Hero Badge earned!");
+        if (h.badges % 3 === 0) {
+          h.trophies++;
+          msgs.push("Household Hero Trophy earned!");
+          if (h.trophies % 3 === 0) {
+            h.helmets++;
+            msgs.push("Hardy Hall-of-Fame Helmet earned!");
+            if (h.helmets >= 3) msgs.push("HARDY HOLLOW LEGEND unlocked!");
+          }
+        }
+      }
+      return msgs;
+    }
+
+    function updateUI() {
+      document.getElementById("team-points-display").textContent = "Kingdom: " + state.teamBank.toLocaleString();
+      var heal = Math.min(100, Math.floor(state.totalHelps * 4 + state.teamBank / 200));
+      var heart = document.getElementById("heart");
+      heart.className = "heart " + (heal < 30 ? "dim" : heal < 70 ? "mid" : "bright");
+      document.getElementById("heart-progress").textContent = heal + "% restored";
+
+      var regions = ["playroom", "kitchen", "laundry", "bedroom"];
+      for (var i = 0; i < regions.length; i++) {
+        var r = regions[i];
+        var el = document.getElementById("status-" + r);
+        var regionEl = document.querySelector('.region[data-region="' + r + '"]');
+        var val = state.regions[r] || 0;
+        if (val >= 70) {
+          el.textContent = "Restored!";
+          regionEl.classList.add("healed");
+        } else if (val >= 30) {
+          el.textContent = "Healing...";
+          regionEl.classList.remove("healed");
+        } else {
+          el.textContent = "Gloomy";
+          regionEl.classList.remove("healed");
+        }
+      }
+
+      var heroes = ["hudson", "camille"];
+      for (var j = 0; j < heroes.length; j++) {
+        var hero = heroes[j];
+        var h = state[hero];
+        document.getElementById(hero + "-points").textContent = h.points.toLocaleString();
+        document.getElementById(hero + "-title").textContent = getRank(hero);
+        var prog = getProgress(hero);
+        document.getElementById(hero + "-progress").style.width = prog.pct + "%";
+        document.getElementById(hero + "-next").textContent = "Next: " + prog.next;
+        var badgesEl = document.getElementById(hero + "-badges");
+        badgesEl.innerHTML = "";
+        if (h.badges) badgesEl.innerHTML += '<span class="badge">Badge x' + h.badges + "</span>";
+        if (h.trophies) badgesEl.innerHTML += '<span class="badge">Trophy x' + h.trophies + "</span>";
+        if (h.helmets) badgesEl.innerHTML += '<span class="badge">Helmet x' + h.helmets + "</span>";
+      }
+
+      var titlesHtml = "";
+      for (var t = 0; t < TITLES.length; t++) {
+        var title = TITLES[t];
+        var earned = state.hudson.titles.indexOf(title) !== -1 || state.camille.titles.indexOf(title) !== -1;
+        titlesHtml += '<span class="title-chip' + (earned ? " earned" : "") + '">' + title + "</span>";
+      }
+      document.getElementById("titles-list").innerHTML = titlesHtml;
+
+      document.getElementById("bank-total").textContent = state.teamBank.toLocaleString();
+      var nextReward = null;
+      for (var r = 0; r < REWARDS.length; r++) {
+        if (state.teamBank < REWARDS[r].cost) {
+          nextReward = REWARDS[r];
+          break;
+        }
+      }
+      if (!nextReward) nextReward = REWARDS[REWARDS.length - 1];
+      var pct = Math.min(100, (state.teamBank / (nextReward.cost || 20000)) * 100);
+      document.getElementById("bank-progress").style.width = pct + "%";
+      document.getElementById("bank-next").textContent = state.teamBank >= 20000 ? "All rewards unlocked!" : "Next unlock at " + nextReward.cost.toLocaleString();
+
+      var rewardsHtml = "";
+      for (var rr = 0; rr < REWARDS.length; rr++) {
+        var rew = REWARDS[rr];
+        var unlocked = state.teamBank >= rew.cost;
+        rewardsHtml += '<div class="reward-item' + (unlocked ? " unlocked" : "") + '"><div class="reward-icon">' + rew.icon + '</div><div class="reward-info"><div class="reward-name">' + rew.name + '</div><div class="reward-cost">' + rew.cost.toLocaleString() + ' team points</div></div><div class="reward-status">' + (unlocked ? "UNLOCKED" : "Locked") + "</div></div>";
+      }
+      document.getElementById("rewards-list").innerHTML = rewardsHtml;
+
+      var log = document.getElementById("teamwork-log");
+      if (state.teamworkLog.length) {
+        var logHtml = "";
+        for (var l = 0; l < Math.min(8, state.teamworkLog.length); l++) {
+          logHtml += "<div>• " + state.teamworkLog[l] + "</div>";
+        }
+        log.innerHTML = logHtml;
+      } else {
+        log.innerHTML = '<div class="empty">Complete quests to fill the Kingdom Bank!</div>';
+      }
+
+      renderQuests();
+      renderPending();
+    }
+
+    function renderQuests() {
+      var list = document.getElementById("quest-list");
+      var html = "";
+      for (var i = 0; i < QUESTS.length; i++) {
+        var q = QUESTS[i];
+        var pending = null;
+        for (var p = 0; p < state.pending.length; p++) {
+          if (state.pending[p].questId === q.id) {
+            pending = state.pending[p];
+            break;
+          }
+        }
+        var statusClass = "";
+        var btnLabel = "Accept";
+        var disabled = false;
+        if (pending) {
+          statusClass = "pending";
+          btnLabel = "Awaiting Parent";
+          disabled = true;
+        }
+        html += '<div class="quest-card' + (q.type === "boss" ? " boss" : "") + (statusClass ? " " + statusClass : "") + '">';
+        html += '<div class="quest-header"><div class="quest-name">' + q.name + '</div><div class="quest-diff">' + q.difficulty + "</div></div>";
+        html += '<div class="quest-flavor">' + q.flavor + "</div>";
+        html += '<div class="quest-footer"><div class="quest-reward">+' + q.points + ' HHP</div>';
+        html += '<button class="quest-btn" data-id="' + q.id + '"' + (disabled ? " disabled" : "") + ">" + btnLabel + "</button></div></div>";
+      }
+      list.innerHTML = html;
+
+      var buttons = list.querySelectorAll(".quest-btn:not([disabled])");
+      for (var b = 0; b < buttons.length; b++) {
+        buttons[b].addEventListener("click", function () {
+          openQuestModal(this.getAttribute("data-id"));
+        });
+      }
+    }
+
+    function renderPending() {
+      var list = document.getElementById("pending-list");
+      if (!state.pending.length) {
+        list.innerHTML = '<div class="empty">No pending quests. Kids accept quests, then you approve them here.</div>';
+        return;
+      }
+      var html = "";
+      for (var i = 0; i < state.pending.length; i++) {
+        var p = state.pending[i];
+        html += '<div class="pending-item"><div class="pending-info"><div class="pending-name">' + p.name + '</div>';
+        html += '<div class="pending-meta">' + (p.hero === "hudson" ? "Hudson" : "Camille") + " • +" + p.points + " HHP</div></div>";
+        html += '<button class="pixel-btn primary approve-btn" data-index="' + i + '" style="padding:8px 14px;font-size:.85rem">Approve</button></div>';
+      }
+      list.innerHTML = html;
+
+      var btns = list.querySelectorAll(".approve-btn");
+      for (var a = 0; a < btns.length; a++) {
+        btns[a].addEventListener("click", function () {
+          approveQuest(parseInt(this.getAttribute("data-index"), 10));
+        });
+      }
+    }
+
+    function openQuestModal(questId) {
+      var q = null;
+      for (var i = 0; i < QUESTS.length; i++) {
+        if (QUESTS[i].id === questId) {
+          q = QUESTS[i];
+          break;
+        }
+      }
+      if (!q) return;
+      document.getElementById("modal-icon").textContent = q.type === "boss" ? "!" : "*";
+      document.getElementById("modal-title").textContent = q.name;
+      document.getElementById("modal-flavor").textContent = q.flavor;
+      document.getElementById("modal-reward").textContent = "+" + q.points + " Hardy Helper Points";
+      document.getElementById("quest-modal").classList.remove("hidden");
+
+      document.getElementById("modal-accept").onclick = function () {
+        var hero = window.confirm("Is Hudson doing this quest?\n\nOK = Hudson\nCancel = Camille") ? "hudson" : "camille";
+        state.pending.push({
+          questId: questId,
+          hero: hero,
+          points: q.points,
+          name: q.name,
+          region: q.region,
+          type: q.type
+        });
+        saveState();
+        updateUI();
+        closeModal();
+        showToast((hero === "hudson" ? "Hudson" : "Camille") + " accepted: " + q.name);
+      };
+    }
+
+    function closeModal() {
+      document.getElementById("quest-modal").classList.add("hidden");
+    }
+
+    function approveQuest(index) {
+      var p = state.pending[index];
+      if (!p) return;
+      var hero = p.hero;
+      state[hero].points += p.points;
+      state.totalHelps++;
+      state.regions[p.region] = Math.min(100, (state.regions[p.region] || 0) + (p.type === "boss" ? 40 : 15));
+      var teamAdd = p.type === "boss" ? Math.floor(p.points * 0.5) : Math.floor(p.points * 0.25);
+      state.teamBank += teamAdd;
+      state.teamworkLog.unshift((p.hero === "hudson" ? "Hudson" : "Camille") + " completed \"" + p.name + "\" (+" + teamAdd + " team)");
+      var msgs = checkMilestones(hero);
+      state.pending.splice(index, 1);
+      saveState();
+      updateUI();
+      var msg = "+" + p.points + " HHP to " + (hero === "hudson" ? "Hudson" : "Camille") + "!";
+      if (teamAdd) msg += "\n+" + teamAdd + " to Kingdom Bank";
+      if (msgs.length) msg += "\n\n" + msgs.join("\n");
+      showCelebration("Quest Approved!", msg);
+    }
+
+    function parentPowerUp() {
+      var hero = window.confirm("Award to Hudson?\n\nOK = Hudson\nCancel = Camille") ? "hudson" : "camille";
+      var amounts = [100, 250, 500, 750, 1000];
+      var amount = amounts[Math.floor(Math.random() * amounts.length)];
+      state[hero].points += amount;
+      state.totalHelps++;
+      var msgs = checkMilestones(hero);
+      saveState();
+      updateUI();
+      var msg = "Parent Power-Up! +" + amount + " HHP to " + (hero === "hudson" ? "Hudson" : "Camille");
+      if (msgs.length) msg += "\n" + msgs.join("\n");
+      showCelebration("Power-Up!", msg);
+    }
+
+    function awardTitle() {
+      var hero = document.getElementById("title-hero").value;
+      var title = document.getElementById("title-select").value;
+      if (state[hero].titles.indexOf(title) === -1) {
+        state[hero].titles.push(title);
+        saveState();
+        updateUI();
+        showToast("Awarded \"" + title + "\" to " + (hero === "hudson" ? "Hudson" : "Camille") + "!");
+      } else {
+        showToast("Already has that title!");
+      }
+    }
+
+    function showToast(text) {
+      var t = document.getElementById("toast");
+      t.textContent = text;
+      t.classList.remove("hidden");
+      setTimeout(function () {
+        t.classList.add("hidden");
+      }, 2800);
+    }
+
+    function showCelebration(title, msg) {
+      document.getElementById("celeb-title").textContent = title;
+      document.getElementById("celeb-msg").textContent = msg;
+      document.getElementById("celebration").classList.remove("hidden");
+    }
+
+    function switchScreen(name) {
+      var screens = document.querySelectorAll(".screen");
+      for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+      var tabs = document.querySelectorAll(".tab");
+      for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
+      document.getElementById("screen-" + name).classList.add("active");
+      document.querySelector('.tab[data-screen="' + name + '"]').classList.add("active");
+      if (name !== "parent") {
+        document.getElementById("parent-lock").classList.remove("hidden");
+        document.getElementById("parent-panel").classList.add("hidden");
+        document.getElementById("pin-input").value = "";
+      }
+    }
+
+    function init() {
+      loadState();
+      document.getElementById("start-btn").addEventListener("click", function () {
+        document.getElementById("splash").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        updateUI();
+      });
+
+      var tabs = document.querySelectorAll(".tab");
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].addEventListener("click", function () {
+          switchScreen(this.getAttribute("data-screen"));
+        });
+      }
+
+      document.getElementById("pin-submit").addEventListener("click", function () {
+        if (document.getElementById("pin-input").value === PIN) {
+          document.getElementById("parent-lock").classList.add("hidden");
+          document.getElementById("parent-panel").classList.remove("hidden");
+        } else {
+          showToast("Wrong PIN");
+          document.getElementById("pin-input").value = "";
+        }
+      });
+
+      document.getElementById("pin-input").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") document.getElementById("pin-submit").click();
+      });
+
+      document.getElementById("power-up-btn").addEventListener("click", parentPowerUp);
+      document.getElementById("award-title-btn").addEventListener("click", awardTitle);
+      document.getElementById("reset-btn").addEventListener("click", function () {
+        if (window.confirm("Reset all demo data?")) {
+          localStorage.removeItem("hardyHollow");
+          location.reload();
+        }
+      });
+
+      document.getElementById("modal-cancel").addEventListener("click", closeModal);
+      document.getElementById("celeb-close").addEventListener("click", function () {
+        document.getElementById("celebration").classList.add("hidden");
+      });
+
+      document.getElementById("add-custom-btn").addEventListener("click", function () {
+        var name = window.prompt("Quest name:");
+        if (!name) return;
+        var points = parseInt(window.prompt("Points (e.g. 500):") || "500", 10);
+        var hero = window.confirm("For Hudson?\nOK = Hudson, Cancel = Camille") ? "hudson" : "camille";
+        state.pending.push({
+          questId: "custom-" + Date.now(),
+          hero: hero,
+          points: points || 500,
+          name: name,
+          region: "bedroom",
+          type: "easy"
+        });
+        saveState();
+        updateUI();
+        showToast("Custom quest added to pending");
+      });
+
+      function updateTime() {
+        var now = new Date();
+        document.getElementById("status-time").textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      }
+      updateTime();
+      setInterval(updateTime, 30000);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
