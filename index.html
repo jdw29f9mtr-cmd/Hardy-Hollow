@@ -42,7 +42,27 @@
     .pixel-heart { font-size: 4rem; color: var(--heart-mid); animation: pulse 1.5s ease-in-out infinite; margin-bottom: 1rem; }
     @keyframes pulse { 0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.15);opacity:1} }
     .title { font-size: 1.6rem; font-weight: 800; color: var(--gold); text-shadow: 2px 2px 0 #5a3a10; margin-bottom: .5rem; letter-spacing: 1px; }
-    .subtitle { color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem; }
+    .subtitle { color: var(--text-dim); font-size: 1rem; margin-bottom: 1rem; }
+    .intro-story {
+      text-align: left;
+      background: rgba(0,0,0,0.35);
+      border-left: 4px solid var(--gold);
+      padding: 14px 16px;
+      border-radius: 0 12px 12px 0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text-dim);
+      margin: 0 auto 1.5rem;
+      max-width: 340px;
+    }
+    .intro-story strong { color: var(--gold-light); }
+    .intro-heroes {
+      text-align: center;
+      font-weight: 800;
+      color: var(--gold);
+      margin: 10px 0 6px;
+      font-size: 0.95rem;
+    }
     .app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; background: var(--bg-dark); position: relative; }
     .app.hidden { display: none; }
     .status-bar { display: flex; justify-content: space-between; padding: 8px 16px 4px; padding-top: calc(var(--safe-top) + 4px); font-size: .75rem; color: var(--text-dim); background: rgba(0,0,0,.3); }
@@ -165,6 +185,13 @@
       <div class="pixel-heart">&#9829;</div>
       <h1 class="title">HARDY HOLLOW</h1>
       <p class="subtitle">The Kingdom Needs Heroes</p>
+      <div class="intro-story">
+        Long ago, the Kingdom of Hardy Hollow sparkled with kindness. Toys returned home on their own, dishes shone, and every room glowed with joy.<br><br>
+        Then Lord Clutter and his mischievous army&mdash;the Dust Bunnies, Laundry Goblins, Sock Snatchers, and Crumb Trolls&mdash;stole the Heart of Helping. The kingdom grew messy and gloomy.<br><br>
+        But two young heroes answered the call:
+        <div class="intro-heroes">Hudson the Brave<br>Camille the Clever</div>
+        Together they will complete quests, earn honor, restore the Heart of Helping, and become legends of Hardy Hollow.
+      </div>
       <button id="start-btn" class="pixel-btn primary">Begin Adventure</button>
     </div>
   </div>
@@ -206,7 +233,7 @@
         <div class="heroes-grid">
           <div class="hero-card">
             <div class="hero-avatar">&#129490;</div>
-            <div class="hero-name">Hudson the Brave</div>
+            <div class="hero-name"><span id="hudson-display-name">Hudson</span> the Brave</div>
             <div class="hero-title" id="hudson-title">Hardy Helper</div>
             <div class="hero-points"><span id="hudson-points">0</span> HHP</div>
             <div class="progress-bar"><div class="progress-fill" id="hudson-progress" style="width:0%"></div></div>
@@ -215,7 +242,7 @@
           </div>
           <div class="hero-card">
             <div class="hero-avatar">&#128103;</div>
-            <div class="hero-name">Camille the Clever</div>
+            <div class="hero-name"><span id="camille-display-name">Camille</span> the Clever</div>
             <div class="hero-title" id="camille-title">Hardy Helper</div>
             <div class="hero-points"><span id="camille-points">0</span> HHP</div>
             <div class="progress-bar"><div class="progress-fill" id="camille-progress" style="width:0%"></div></div>
@@ -248,7 +275,7 @@
       </section>
 
       <section id="screen-parent" class="screen">
-        <div id="parent-lock" class="parent-lock">
+        <div id="parent-lock" class="parent-lock hidden">
           <div class="lock-icon">&#128274;</div>
           <div class="lock-title">Parent Zone</div>
           <p>Enter PIN to continue</p>
@@ -256,13 +283,27 @@
           <button id="pin-submit" class="pixel-btn primary">Unlock</button>
           <p class="pin-hint">Default PIN: 1234</p>
         </div>
-        <div id="parent-panel" class="parent-panel hidden">
+        <div id="parent-panel" class="parent-panel">
           <div class="section-title">Pending Approvals</div>
           <div id="pending-list" class="pending-list"></div>
           <div class="parent-actions">
             <button id="power-up-btn" class="pixel-btn secondary">Parent Power-Up</button>
             <button id="add-custom-btn" class="pixel-btn secondary">Custom Quest</button>
             <button id="reset-btn" class="pixel-btn danger">Reset Demo Data</button>
+          </div>
+          <div class="section-title">Edit Hero Names</div>
+          <div class="name-edit" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label style="min-width:70px;font-size:0.85rem;color:var(--text-dim);">Hero 1</label>
+              <input type="text" id="edit-name-hudson" maxlength="16" placeholder="Hudson"
+                style="flex:1;padding:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label style="min-width:70px;font-size:0.85rem;color:var(--text-dim);">Hero 2</label>
+              <input type="text" id="edit-name-camille" maxlength="16" placeholder="Camille"
+                style="flex:1;padding:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;" />
+            </div>
+            <button id="save-names-btn" class="pixel-btn primary" style="align-self:flex-start;padding:10px 18px;font-size:0.9rem;">Save Names</button>
           </div>
           <div class="section-title">Award Special Title</div>
           <div class="title-award">
@@ -312,22 +353,157 @@
 
   <script>
     const PIN = "1234";
-    const QUESTS = [
-      { id: "bed", name: "Defeat the Blanket Beast", flavor: "Make your bed and restore order to the Bedroom Barracks!", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
-      { id: "hamper", name: "Banish the Laundry Goblins", flavor: "Put all dirty clothes in the hamper.", points: 300, difficulty: "*", region: "laundry", type: "easy" },
-      { id: "table", name: "Scatter Captain Crumbs Minions", flavor: "Clear your place at the table after a meal.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
-      { id: "toys", name: "Toy Takedown", flavor: "Return every toy to its proper home in the Playroom Forest.", points: 400, difficulty: "**", region: "playroom", type: "easy" },
-      { id: "wipe", name: "Polish the Royal Feast Board", flavor: "Wipe the table until it shines.", points: 450, difficulty: "**", region: "kitchen", type: "easy" },
-      { id: "load-dish", name: "Feed the Sink Serpent", flavor: "Load the dishwasher with the day's dishes.", points: 600, difficulty: "**", region: "kitchen", type: "medium" },
-      { id: "unload-dish", name: "Tame the Sink Serpent", flavor: "Unload the clean dishwasher and put everything away.", points: 650, difficulty: "**", region: "kitchen", type: "medium" },
-      { id: "fold", name: "Conquer Laundry Mountain", flavor: "Fold a full basket of clean laundry.", points: 800, difficulty: "***", region: "laundry", type: "medium" },
-      { id: "sweep", name: "Crush the Crumb Trolls", flavor: "Sweep the kitchen floor clean of all crumbs.", points: 700, difficulty: "**", region: "kitchen", type: "medium" },
-      { id: "surfaces", name: "Banish Bedroom Clutter Sprites", flavor: "Tidy all surfaces in your bedroom.", points: 750, difficulty: "**", region: "bedroom", type: "medium" },
-      { id: "playroom-boss", name: "Defeat Lord Clutter", flavor: "Clean the entire Playroom Forest. No toy left behind!", points: 2000, difficulty: "****", region: "playroom", type: "boss" },
-      { id: "kitchen-boss", name: "Vanquish Captain Crumbs", flavor: "Full Kitchen Reset: clear, load, wipe and sweep.", points: 1800, difficulty: "****", region: "kitchen", type: "boss" },
-      { id: "laundry-boss", name: "Dethrone Queen Laundry", flavor: "Fold and put away ALL the laundry.", points: 2200, difficulty: "****", region: "laundry", type: "boss" },
-      { id: "dust-boss", name: "Slay the Dust Bunny King", flavor: "Dust all the furniture in one room.", points: 1500, difficulty: "***", region: "bedroom", type: "boss" }
+    const QUEST_POOL = [
+      { name: "Defeat the Blanket Beast", flavor: "Make your bed and restore order to the Bedroom Barracks!", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Tame the Pillow Pile", flavor: "Fluff the pillows and straighten the covers.", points: 200, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Banish Bedroom Clutter Sprites", flavor: "Tidy all surfaces in your bedroom.", points: 750, difficulty: "**", region: "bedroom", type: "medium" },
+      { name: "Closet Commander Mission", flavor: "Hang up or fold clothes left on the floor or chair.", points: 400, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Sock Savior Sweep", flavor: "Gather every loose sock and put them where they belong.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Nightstand Neatness", flavor: "Clear and wipe your nightstand.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Under-Bed Expedition", flavor: "Pull out everything hiding under the bed and put it away.", points: 600, difficulty: "**", region: "bedroom", type: "medium" },
+      { name: "Drawer Dragon Taming", flavor: "Organize one messy drawer.", points: 450, difficulty: "**", region: "bedroom", type: "easy" },
+      { name: "Slay the Dust Bunny King", flavor: "Dust all the furniture in one room.", points: 1500, difficulty: "***", region: "bedroom", type: "boss" },
+      { name: "Bedtime Barracks Reset", flavor: "Full bedroom tidy before lights out.", points: 900, difficulty: "***", region: "bedroom", type: "medium" },
+      { name: "Pajama Patrol", flavor: "Put dirty pajamas in the hamper and set out clean ones.", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Book Dragon Feeding", flavor: "Return every book to the bookshelf.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Lamp Light Check", flavor: "Wipe the lamp and clear space around it.", points: 200, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Floor Freedom Fight", flavor: "Clear a walking path across the whole bedroom floor.", points: 500, difficulty: "**", region: "bedroom", type: "medium" },
+      { name: "Mirror Magic Polish", flavor: "Clean the bedroom mirror until it shines.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Toy Takedown", flavor: "Return every toy to its proper home in the Playroom Forest.", points: 400, difficulty: "**", region: "playroom", type: "easy" },
+      { name: "Defeat Lord Clutter", flavor: "Clean the entire Playroom Forest. No toy left behind!", points: 2000, difficulty: "****", region: "playroom", type: "boss" },
+      { name: "Block Brigade", flavor: "Sort and put away all building blocks.", points: 350, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Stuffed Animal Summit", flavor: "Gather every stuffed animal and place them on the bed or shelf.", points: 300, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Puzzle Piece Patrol", flavor: "Find and box all loose puzzle pieces.", points: 400, difficulty: "**", region: "playroom", type: "easy" },
+      { name: "Car Garage Return", flavor: "Park every toy car and truck in its bin.", points: 350, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Art Attack Cleanup", flavor: "Put away crayons, markers, paper, and art supplies.", points: 450, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Lego Legion Recall", flavor: "Sort Legos back into their containers.", points: 500, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Game Box Guardian", flavor: "Put board games and cards back in their boxes.", points: 400, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Playmat Roll-Up", flavor: "Clear and roll or fold the playmat.", points: 300, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Toy Bin Tetris", flavor: "Refill the toy bins so lids can close.", points: 450, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Lost Toy Rescue", flavor: "Search the room and return three lost toys to their homes.", points: 350, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Fortress Disassembly", flavor: "Take down any forts or pillow piles and put pieces away.", points: 600, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Dollhouse Order", flavor: "Straighten the dollhouse or action-figure display.", points: 300, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Outdoor Gear Return", flavor: "Bring in outdoor toys and put them in their spot.", points: 400, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Scatter Captain Crumbs Minions", flavor: "Clear your place at the table after a meal.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Polish the Royal Feast Board", flavor: "Wipe the table until it shines.", points: 450, difficulty: "**", region: "kitchen", type: "easy" },
+      { name: "Feed the Sink Serpent", flavor: "Load the dishwasher with the day's dishes.", points: 600, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Tame the Sink Serpent", flavor: "Unload the clean dishwasher and put everything away.", points: 650, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Crush the Crumb Trolls", flavor: "Sweep the kitchen floor clean of all crumbs.", points: 700, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Vanquish Captain Crumbs", flavor: "Full Kitchen Reset: clear, load, wipe and sweep.", points: 1800, difficulty: "****", region: "kitchen", type: "boss" },
+      { name: "Countertop Crusade", flavor: "Clear and wipe the kitchen counters.", points: 500, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Cupboard Clutter Clear", flavor: "Straighten one kitchen cupboard or pantry shelf.", points: 400, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Trash Titan Takedown", flavor: "Empty the kitchen trash and replace the bag.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Recycling Ranger", flavor: "Sort and take out the recycling.", points: 400, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Silverware Sort", flavor: "Put away clean silverware from the dishwasher.", points: 300, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Napkin Knight Duty", flavor: "Set the table with plates, cups, and napkins.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Fridge Front Guard", flavor: "Wipe the front of the refrigerator.", points: 250, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Spice Rack Rescue", flavor: "Line up the spices so labels face forward.", points: 300, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Floor Crumb Hunt", flavor: "Spot-sweep under the table and chairs.", points: 400, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Dish Towel Duty", flavor: "Hang clean towels and put dirty ones in the laundry.", points: 200, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Breakfast Cleanup Blitz", flavor: "Clear all breakfast dishes and wipe the table.", points: 450, difficulty: "**", region: "kitchen", type: "easy" },
+      { name: "Dinner Aftermath Assault", flavor: "Help clear the table after dinner.", points: 400, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Banish the Laundry Goblins", flavor: "Put all dirty clothes in the hamper.", points: 300, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Conquer Laundry Mountain", flavor: "Fold a full basket of clean laundry.", points: 800, difficulty: "***", region: "laundry", type: "medium" },
+      { name: "Dethrone Queen Laundry", flavor: "Fold and put away ALL the laundry.", points: 2200, difficulty: "****", region: "laundry", type: "boss" },
+      { name: "Sock Pairing Quest", flavor: "Match and fold at least ten pairs of socks.", points: 450, difficulty: "**", region: "laundry", type: "easy" },
+      { name: "Towel Tower Task", flavor: "Fold all the towels in the basket.", points: 500, difficulty: "**", region: "laundry", type: "medium" },
+      { name: "Shirt Stack Challenge", flavor: "Fold and put away shirts or tops.", points: 400, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Pants Patrol", flavor: "Fold and put away pants or shorts.", points: 400, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Hamper Hero Run", flavor: "Carry the full hamper to the laundry area.", points: 250, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Clean Clothes Courier", flavor: "Put away one complete load of clean clothes.", points: 600, difficulty: "**", region: "laundry", type: "medium" },
+      { name: "Laundry Basket Return", flavor: "Bring empty baskets back to their rooms.", points: 200, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Underwear Uprising", flavor: "Sort and put away clean underwear and socks.", points: 350, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Sheet Squad Mission", flavor: "Help fold a set of sheets or a blanket.", points: 550, difficulty: "**", region: "laundry", type: "medium" },
+      { name: "Dryer Dive", flavor: "Empty the dryer and sort the warm clothes.", points: 400, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Washer Watch", flavor: "Move clean wet clothes from washer to dryer (with help).", points: 350, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Entryway Guardian", flavor: "Clear shoes and coats from the entry area.", points: 400, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Shoe Shelf Shuffle", flavor: "Line up shoes neatly by the door.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Coat Closet Campaign", flavor: "Hang up jackets and backpacks.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Backpack Banishing", flavor: "Empty and tidy your backpack for tomorrow.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Homework Haven", flavor: "Clear the desk or table used for homework.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Trash Treasure Hunt", flavor: "Empty small trash cans in bedrooms.", points: 400, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Light Switch Wipe", flavor: "Wipe light switches and door handles in one area.", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Baseboard Scout", flavor: "Wipe baseboards along one wall.", points: 400, difficulty: "**", region: "bedroom", type: "medium" },
+      { name: "Window Sill Wipe", flavor: "Dust or wipe one window sill.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Plant Watering Patrol", flavor: "Water the houseplants that need it (with guidance).", points: 300, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Mail Mountain Move", flavor: "Sort the mail pile into keep / recycle.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Couch Cushion Quest", flavor: "Fluff couch cushions and pick up items underneath.", points: 400, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Remote Control Rescue", flavor: "Find all remotes and put them in their spot.", points: 250, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Blanket Fold Brigade", flavor: "Fold throw blankets and drape them neatly.", points: 300, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Living Room Sweep", flavor: "Quick pick-up of the main living area.", points: 500, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Bathroom Basket Duty", flavor: "Put bathroom items back in their places.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Towel Hang Hero", flavor: "Hang up bath towels properly.", points: 200, difficulty: "*", region: "laundry", type: "easy" },
+      { name: "Toothbrush Station Tidy", flavor: "Straighten the sink area after brushing teeth.", points: 200, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Grocery Unload Helper", flavor: "Help put away groceries in pantry and fridge.", points: 600, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Pantry Pirate Sort", flavor: "Line up cans or boxes so labels show.", points: 400, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Fridge Clean-Out Assist", flavor: "Help remove old items from the fridge (with parent).", points: 500, difficulty: "**", region: "kitchen", type: "medium" },
+      { name: "Table Setting Knight", flavor: "Set the full table for a family meal.", points: 450, difficulty: "**", region: "kitchen", type: "easy" },
+      { name: "Chair Push Patrol", flavor: "Push in all chairs after a meal.", points: 150, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Floor Spot Check", flavor: "Wipe or sweep three obvious spots on the floor.", points: 300, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Door Mat Shake", flavor: "Take outdoor mats outside and shake them.", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Library Return", flavor: "Gather library books and put them in the return bag.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Paper Pile Patrol", flavor: "Sort a stack of papers into recycle or keep.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Cable Tamer", flavor: "Neaten charger cables in one area.", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Desk Drawer Tidy", flavor: "Organize the top drawer of a desk.", points: 400, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Shelf Stylist", flavor: "Straighten items on one shelf so they look neat.", points: 300, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Bin Lid Closer", flavor: "Make sure all toy and storage bin lids are closed.", points: 200, difficulty: "*", region: "playroom", type: "easy" },
+      { name: "Lost-and-Found Sweep", flavor: "Collect items that belong in other rooms and return them.", points: 450, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Morning Mission Ready", flavor: "Lay out clothes for tomorrow morning.", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Evening Reset Ritual", flavor: "Ten-minute whole-room pick-up before bed.", points: 700, difficulty: "**", region: "bedroom", type: "medium" },
+      { name: "Sibling Space Share", flavor: "Help tidy a shared play or living area together.", points: 500, difficulty: "**", region: "playroom", type: "medium" },
+      { name: "Hallway Clear Path", flavor: "Remove toys or shoes from the hallway.", points: 300, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Stair Spot Check", flavor: "Pick up anything left on the stairs.", points: 350, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Mudroom Marshal", flavor: "Tidy boots, bags, and gear in the mudroom or entry.", points: 400, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Picnic Pack-Up", flavor: "Help clean up after a snack or picnic at home.", points: 350, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Snack Station Restock", flavor: "Put snack containers back where they belong.", points: 250, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Water Bottle Return", flavor: "Collect water bottles and put them by the sink or in the fridge.", points: 200, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "Lunchbox Legion", flavor: "Empty and rinse lunchboxes after school.", points: 300, difficulty: "*", region: "kitchen", type: "easy" },
+      { name: "After-School Avalanche", flavor: "Unpack backpacks and put papers in the right spot.", points: 400, difficulty: "*", region: "bedroom", type: "easy" }
     ];
+
+    const MAX_VISIBLE_QUESTS = 12;
+
+    function makeQuestId() {
+      return "q-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+    }
+
+    function pickRandomFromPool(excludeNames) {
+      excludeNames = excludeNames || [];
+      var candidates = [];
+      for (var i = 0; i < QUEST_POOL.length; i++) {
+        if (excludeNames.indexOf(QUEST_POOL[i].name) === -1) {
+          candidates.push(QUEST_POOL[i]);
+        }
+      }
+      if (!candidates.length) candidates = QUEST_POOL.slice();
+      var base = candidates[Math.floor(Math.random() * candidates.length)];
+      var variance = Math.floor(base.points * 0.1);
+      var pts = base.points + Math.floor(Math.random() * (variance * 2 + 1)) - variance;
+      if (pts < 100) pts = 100;
+      return {
+        id: makeQuestId(),
+        name: base.name,
+        flavor: base.flavor,
+        points: pts,
+        difficulty: base.difficulty,
+        region: base.region,
+        type: base.type
+      };
+    }
+
+    function buildInitialQuests() {
+      var used = [];
+      var list = [];
+      for (var i = 0; i < MAX_VISIBLE_QUESTS; i++) {
+        var q = pickRandomFromPool(used);
+        used.push(q.name);
+        list.push(q);
+      }
+      return list;
+    }
+
+    var availableQuests = [];
+
     const REWARDS = [
       { id: "movie", name: "Family Movie Night", cost: 2000, icon: "P" },
       { id: "icecream", name: "Ice-Cream Outing", cost: 5000, icon: "I" },
@@ -339,13 +515,14 @@
     const TITLES = ["Laundry Legend", "Toy Tamer", "Crumb Crusher", "Dust Destroyer", "Sock Savior", "Bed-Making Baron", "Tidy Titan", "Dish Dragon"];
 
     let state = {
-      hudson: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
-      camille: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
+      hudson: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [], displayName: "Hudson" },
+      camille: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [], displayName: "Camille" },
       teamBank: 0,
       pending: [],
       teamworkLog: [],
       regions: { playroom: 0, kitchen: 0, laundry: 0, bedroom: 0 },
-      totalHelps: 0
+      totalHelps: 0,
+      availableQuests: []
     };
 
     function loadState() {
@@ -360,14 +537,30 @@
           state.teamworkLog = parsed.teamworkLog || [];
           state.regions = parsed.regions || state.regions;
           state.totalHelps = parsed.totalHelps || 0;
+          state.availableQuests = parsed.availableQuests || [];
         }
       } catch (e) {}
+      if (!state.availableQuests || state.availableQuests.length < 6) {
+        state.availableQuests = buildInitialQuests();
+        saveState();
+      }
+      availableQuests = state.availableQuests;
+      // Ensure display names exist (older saves)
+      if (!state.hudson.displayName) state.hudson.displayName = "Hudson";
+      if (!state.camille.displayName) state.camille.displayName = "Camille";
     }
 
     function saveState() {
       try {
         localStorage.setItem("hardyHollow", JSON.stringify(state));
       } catch (e) {}
+    }
+
+
+    function heroName(key) {
+      if (key === "hudson") return state.hudson.displayName || "Hudson";
+      if (key === "camille") return state.camille.displayName || "Camille";
+      return key;
     }
 
     function getRank(hero) {
@@ -440,6 +633,8 @@
       for (var j = 0; j < heroes.length; j++) {
         var hero = heroes[j];
         var h = state[hero];
+        var nameEl = document.getElementById(hero + "-display-name");
+        if (nameEl) nameEl.textContent = h.displayName || heroName(hero);
         document.getElementById(hero + "-points").textContent = h.points.toLocaleString();
         document.getElementById(hero + "-title").textContent = getRank(hero);
         var prog = getProgress(hero);
@@ -499,8 +694,8 @@
     function renderQuests() {
       var list = document.getElementById("quest-list");
       var html = "";
-      for (var i = 0; i < QUESTS.length; i++) {
-        var q = QUESTS[i];
+      for (var i = 0; i < availableQuests.length; i++) {
+        var q = availableQuests[i];
         var pending = null;
         for (var p = 0; p < state.pending.length; p++) {
           if (state.pending[p].questId === q.id) {
@@ -542,7 +737,7 @@
       for (var i = 0; i < state.pending.length; i++) {
         var p = state.pending[i];
         html += '<div class="pending-item"><div class="pending-info"><div class="pending-name">' + p.name + '</div>';
-        html += '<div class="pending-meta">' + (p.hero === "hudson" ? "Hudson" : "Camille") + " • +" + p.points + " HHP</div></div>";
+        html += '<div class="pending-meta">' + heroName(p.hero) + " • +" + p.points + " HHP</div></div>";
         html += '<button class="pixel-btn primary approve-btn" data-index="' + i + '" style="padding:8px 14px;font-size:.85rem">Approve</button></div>';
       }
       list.innerHTML = html;
@@ -557,9 +752,9 @@
 
     function openQuestModal(questId) {
       var q = null;
-      for (var i = 0; i < QUESTS.length; i++) {
-        if (QUESTS[i].id === questId) {
-          q = QUESTS[i];
+      for (var i = 0; i < availableQuests.length; i++) {
+        if (availableQuests[i].id === questId) {
+          q = availableQuests[i];
           break;
         }
       }
@@ -571,7 +766,7 @@
       document.getElementById("quest-modal").classList.remove("hidden");
 
       document.getElementById("modal-accept").onclick = function () {
-        var hero = window.confirm("Is Hudson doing this quest?\n\nOK = Hudson\nCancel = Camille") ? "hudson" : "camille";
+        var hero = window.confirm("Is " + heroName("hudson") + " doing this quest?\n\nOK = " + heroName("hudson") + "\nCancel = " + heroName("camille")) ? "hudson" : "camille";
         state.pending.push({
           questId: questId,
           hero: hero,
@@ -583,7 +778,7 @@
         saveState();
         updateUI();
         closeModal();
-        showToast((hero === "hudson" ? "Hudson" : "Camille") + " accepted: " + q.name);
+        showToast(heroName(hero) + " accepted: " + q.name);
       };
     }
 
@@ -600,19 +795,35 @@
       state.regions[p.region] = Math.min(100, (state.regions[p.region] || 0) + (p.type === "boss" ? 40 : 15));
       var teamAdd = p.type === "boss" ? Math.floor(p.points * 0.5) : Math.floor(p.points * 0.25);
       state.teamBank += teamAdd;
-      state.teamworkLog.unshift((p.hero === "hudson" ? "Hudson" : "Camille") + " completed \"" + p.name + "\" (+" + teamAdd + " team)");
+      state.teamworkLog.unshift(heroName(p.hero) + " completed \"" + p.name + "\" (+" + teamAdd + " team)");
       var msgs = checkMilestones(hero);
       state.pending.splice(index, 1);
+
+      // Remove completed quest and spawn a fresh one from the 100+ pool
+      var newList = [];
+      for (var i = 0; i < availableQuests.length; i++) {
+        if (availableQuests[i].id !== p.questId) {
+          newList.push(availableQuests[i]);
+        }
+      }
+      var usedNames = [];
+      for (var u = 0; u < newList.length; u++) usedNames.push(newList[u].name);
+      var fresh = pickRandomFromPool(usedNames);
+      newList.push(fresh);
+      availableQuests = newList;
+      state.availableQuests = availableQuests;
+
       saveState();
       updateUI();
-      var msg = "+" + p.points + " HHP to " + (hero === "hudson" ? "Hudson" : "Camille") + "!";
+      var msg = "+" + p.points + " HHP to " + heroName(hero) + "!";
       if (teamAdd) msg += "\n+" + teamAdd + " to Kingdom Bank";
       if (msgs.length) msg += "\n\n" + msgs.join("\n");
+      msg += "\n\nA new quest has appeared!";
       showCelebration("Quest Approved!", msg);
     }
 
     function parentPowerUp() {
-      var hero = window.confirm("Award to Hudson?\n\nOK = Hudson\nCancel = Camille") ? "hudson" : "camille";
+      var hero = window.confirm("Award to " + heroName("hudson") + "?\n\nOK = " + heroName("hudson") + "\nCancel = " + heroName("camille")) ? "hudson" : "camille";
       var amounts = [100, 250, 500, 750, 1000];
       var amount = amounts[Math.floor(Math.random() * amounts.length)];
       state[hero].points += amount;
@@ -620,7 +831,7 @@
       var msgs = checkMilestones(hero);
       saveState();
       updateUI();
-      var msg = "Parent Power-Up! +" + amount + " HHP to " + (hero === "hudson" ? "Hudson" : "Camille");
+      var msg = "Parent Power-Up! +" + amount + " HHP to " + heroName(hero);
       if (msgs.length) msg += "\n" + msgs.join("\n");
       showCelebration("Power-Up!", msg);
     }
@@ -632,7 +843,7 @@
         state[hero].titles.push(title);
         saveState();
         updateUI();
-        showToast("Awarded \"" + title + "\" to " + (hero === "hudson" ? "Hudson" : "Camille") + "!");
+        showToast("Awarded \"" + title + "\" to " + heroName(hero) + "!");
       } else {
         showToast("Already has that title!");
       }
@@ -660,10 +871,17 @@
       for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
       document.getElementById("screen-" + name).classList.add("active");
       document.querySelector('.tab[data-screen="' + name + '"]').classList.add("active");
-      if (name !== "parent") {
-        document.getElementById("parent-lock").classList.remove("hidden");
-        document.getElementById("parent-panel").classList.add("hidden");
-        document.getElementById("pin-input").value = "";
+      if (name === "parent") {
+        // Fill name fields when opening parent
+        var eh = document.getElementById("edit-name-hudson");
+        var ec = document.getElementById("edit-name-camille");
+        if (eh) eh.value = state.hudson.displayName || "Hudson";
+        if (ec) ec.value = state.camille.displayName || "Camille";
+        var sel = document.getElementById("title-hero");
+        if (sel && sel.options.length >= 2) {
+          sel.options[0].text = state.hudson.displayName || "Hudson";
+          sel.options[1].text = state.camille.displayName || "Camille";
+        }
       }
     }
 
@@ -682,22 +900,30 @@
         });
       }
 
-      document.getElementById("pin-submit").addEventListener("click", function () {
-        if (document.getElementById("pin-input").value === PIN) {
-          document.getElementById("parent-lock").classList.add("hidden");
-          document.getElementById("parent-panel").classList.remove("hidden");
-        } else {
-          showToast("Wrong PIN");
-          document.getElementById("pin-input").value = "";
-        }
-      });
 
-      document.getElementById("pin-input").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") document.getElementById("pin-submit").click();
-      });
 
       document.getElementById("power-up-btn").addEventListener("click", parentPowerUp);
       document.getElementById("award-title-btn").addEventListener("click", awardTitle);
+      document.getElementById("save-names-btn").addEventListener("click", function () {
+        var n1 = (document.getElementById("edit-name-hudson").value || "").trim();
+        var n2 = (document.getElementById("edit-name-camille").value || "").trim();
+        if (!n1) n1 = "Hudson";
+        if (!n2) n2 = "Camille";
+        // Limit length
+        if (n1.length > 16) n1 = n1.slice(0, 16);
+        if (n2.length > 16) n2 = n2.slice(0, 16);
+        state.hudson.displayName = n1;
+        state.camille.displayName = n2;
+        // Update title dropdown labels
+        var sel = document.getElementById("title-hero");
+        if (sel && sel.options.length >= 2) {
+          sel.options[0].text = n1;
+          sel.options[1].text = n2;
+        }
+        saveState();
+        updateUI();
+        showToast("Names saved: " + n1 + " & " + n2);
+      });
       document.getElementById("reset-btn").addEventListener("click", function () {
         if (window.confirm("Reset all demo data?")) {
           localStorage.removeItem("hardyHollow");
@@ -714,7 +940,7 @@
         var name = window.prompt("Quest name:");
         if (!name) return;
         var points = parseInt(window.prompt("Points (e.g. 500):") || "500", 10);
-        var hero = window.confirm("For Hudson?\nOK = Hudson, Cancel = Camille") ? "hudson" : "camille";
+        var hero = window.confirm("For " + heroName("hudson") + "?\nOK = " + heroName("hudson") + ", Cancel = " + heroName("camille")) ? "hudson" : "camille";
         state.pending.push({
           questId: "custom-" + Date.now(),
           hero: hero,
