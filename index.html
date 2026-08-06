@@ -189,7 +189,7 @@
         Long ago, the Kingdom of Hardy Hollow sparkled with kindness. Toys returned home on their own, dishes shone, and every room glowed with joy.<br><br>
         Then Lord Clutter and his mischievous army&mdash;the Dust Bunnies, Laundry Goblins, Sock Snatchers, and Crumb Trolls&mdash;stole the Heart of Helping. The kingdom grew messy and gloomy.<br><br>
         But two young heroes answered the call:
-        <div class="intro-heroes">Hudson the Brave<br>Camille the Clever</div>
+        <div class="intro-heroes" id="splash-heroes-list">Hudson the Brave<br>Camille the Clever</div>
         Together they will complete quests, earn honor, restore the Heart of Helping, and become legends of Hardy Hollow.
       </div>
       <button id="start-btn" class="pixel-btn primary">Begin Adventure</button>
@@ -230,26 +230,7 @@
       </section>
 
       <section id="screen-heroes" class="screen">
-        <div class="heroes-grid">
-          <div class="hero-card">
-            <div class="hero-avatar">&#129490;</div>
-            <div class="hero-name"><span id="hudson-display-name">Hudson</span> the Brave</div>
-            <div class="hero-title" id="hudson-title">Hardy Helper</div>
-            <div class="hero-points"><span id="hudson-points">0</span> HHP</div>
-            <div class="progress-bar"><div class="progress-fill" id="hudson-progress" style="width:0%"></div></div>
-            <div class="progress-label" id="hudson-next">Next: Helpful Hero Badge</div>
-            <div class="badges" id="hudson-badges"></div>
-          </div>
-          <div class="hero-card">
-            <div class="hero-avatar">&#128103;</div>
-            <div class="hero-name"><span id="camille-display-name">Camille</span> the Clever</div>
-            <div class="hero-title" id="camille-title">Hardy Helper</div>
-            <div class="hero-points"><span id="camille-points">0</span> HHP</div>
-            <div class="progress-bar"><div class="progress-fill" id="camille-progress" style="width:0%"></div></div>
-            <div class="progress-label" id="camille-next">Next: Helpful Hero Badge</div>
-            <div class="badges" id="camille-badges"></div>
-          </div>
-        </div>
+        <div class="heroes-grid" id="heroes-grid"></div>
         <div style="margin-top:20px">
           <div class="section-title">Special Titles</div>
           <div id="titles-list" class="titles-list"></div>
@@ -275,39 +256,26 @@
       </section>
 
       <section id="screen-parent" class="screen">
-        <div id="parent-lock" class="parent-lock hidden">
-          <div class="lock-icon">&#128274;</div>
-          <div class="lock-title">Parent Zone</div>
-          <p>Enter PIN to continue</p>
-          <input type="password" id="pin-input" maxlength="4" placeholder="••••" inputmode="numeric" />
-          <button id="pin-submit" class="pixel-btn primary">Unlock</button>
-          <p class="pin-hint">Default PIN: 1234</p>
-        </div>
         <div id="parent-panel" class="parent-panel">
           <div class="section-title">Pending Approvals</div>
           <div id="pending-list" class="pending-list"></div>
+
           <div class="parent-actions">
             <button id="power-up-btn" class="pixel-btn secondary">Parent Power-Up</button>
             <button id="add-custom-btn" class="pixel-btn secondary">Custom Quest</button>
-            <button id="reset-btn" class="pixel-btn danger">Reset Demo Data</button>
           </div>
-          <div class="section-title">Edit Hero Names</div>
-          <div class="name-edit" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <label style="min-width:70px;font-size:0.85rem;color:var(--text-dim);">Hero 1</label>
-              <input type="text" id="edit-name-hudson" maxlength="16" placeholder="Hudson"
-                style="flex:1;padding:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;" />
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <label style="min-width:70px;font-size:0.85rem;color:var(--text-dim);">Hero 2</label>
-              <input type="text" id="edit-name-camille" maxlength="16" placeholder="Camille"
-                style="flex:1;padding:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;" />
-            </div>
-            <button id="save-names-btn" class="pixel-btn primary" style="align-self:flex-start;padding:10px 18px;font-size:0.9rem;">Save Names</button>
+
+          <div class="section-title">Manage Heroes</div>
+          <div id="heroes-edit-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;"></div>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin:0 0 10px;">Tip: tap emoji box and use your keyboard emoji picker</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+            <button id="save-names-btn" class="pixel-btn primary" style="padding:10px 18px;font-size:0.9rem;">Save Heroes</button>
+            <button id="add-hero-btn" class="pixel-btn secondary" style="padding:10px 18px;font-size:0.9rem;">+ Add Hero</button>
           </div>
+
           <div class="section-title">Award Special Title</div>
-          <div class="title-award">
-            <select id="title-hero"><option value="hudson">Hudson</option><option value="camille">Camille</option></select>
+          <div class="title-award" style="margin-bottom:24px;">
+            <select id="title-hero"></select>
             <select id="title-select">
               <option>Laundry Legend</option><option>Toy Tamer</option><option>Crumb Crusher</option>
               <option>Dust Destroyer</option><option>Sock Savior</option><option>Bed-Making Baron</option>
@@ -315,6 +283,9 @@
             </select>
             <button id="award-title-btn" class="pixel-btn primary">Award</button>
           </div>
+
+          <div class="section-title">Danger Zone</div>
+          <button id="reset-btn" class="pixel-btn danger" style="width:100%;">Reset Demo Data</button>
         </div>
       </section>
     </main>
@@ -352,8 +323,10 @@
   </div>
 
   <script>
-    const PIN = "1234";
     const QUEST_POOL = [
+      { name: "Bed Making Maniac", flavor: "Make your bed and tidy your pillows", points: 100, difficulty: "*", region: "bedroom", type: "easy" },
+      { name: "Tooth Brush Battle", flavor: "Brush your teeth and put your toothbrush and toothpaste away", points: 100, difficulty: "*", region: "bedroom", type: "easy" },
+
       { name: "Defeat the Blanket Beast", flavor: "Make your bed and restore order to the Bedroom Barracks!", points: 250, difficulty: "*", region: "bedroom", type: "easy" },
       { name: "Tame the Pillow Pile", flavor: "Fluff the pillows and straighten the covers.", points: 200, difficulty: "*", region: "bedroom", type: "easy" },
       { name: "Banish Bedroom Clutter Sprites", flavor: "Tidy all surfaces in your bedroom.", points: 750, difficulty: "**", region: "bedroom", type: "medium" },
@@ -494,7 +467,27 @@
     function buildInitialQuests() {
       var used = [];
       var list = [];
-      for (var i = 0; i < MAX_VISIBLE_QUESTS; i++) {
+      // Always include the two level-1 daily quests first
+      var dailyNames = ["Bed Making Maniac", "Tooth Brush Battle"];
+      for (var d = 0; d < dailyNames.length; d++) {
+        for (var p = 0; p < QUEST_POOL.length; p++) {
+          if (QUEST_POOL[p].name === dailyNames[d]) {
+            var base = QUEST_POOL[p];
+            list.push({
+              id: makeQuestId(),
+              name: base.name,
+              flavor: base.flavor,
+              points: base.points,
+              difficulty: base.difficulty,
+              region: base.region,
+              type: base.type
+            });
+            used.push(base.name);
+            break;
+          }
+        }
+      }
+      while (list.length < MAX_VISIBLE_QUESTS) {
         var q = pickRandomFromPool(used);
         used.push(q.name);
         list.push(q);
@@ -505,18 +498,20 @@
     var availableQuests = [];
 
     const REWARDS = [
-      { id: "movie", name: "Family Movie Night", cost: 2000, icon: "P" },
-      { id: "icecream", name: "Ice-Cream Outing", cost: 5000, icon: "I" },
-      { id: "late", name: "Stay-Up-Late Pass", cost: 5000, icon: "L" },
-      { id: "saturday", name: "Choose Saturday Activity", cost: 10000, icon: "S" },
-      { id: "boardgame", name: "New Family Board Game", cost: 10000, icon: "B" },
-      { id: "adventure", name: "Big Adventure (Zoo / Camping)", cost: 20000, icon: "A" }
+      { id: "movie", name: "Family Movie Night", cost: 2000, icon: "🍿" },
+      { id: "icecream", name: "Ice-Cream Outing", cost: 5000, icon: "🍦" },
+      { id: "late", name: "Stay-Up-Late Pass", cost: 5000, icon: "🌙" },
+      { id: "saturday", name: "Choose Saturday Activity", cost: 10000, icon: "🎲" },
+      { id: "boardgame", name: "New Family Board Game", cost: 10000, icon: "🧩" },
+      { id: "adventure", name: "Big Adventure (Zoo / Camping)", cost: 20000, icon: "🏕️" }
     ];
     const TITLES = ["Laundry Legend", "Toy Tamer", "Crumb Crusher", "Dust Destroyer", "Sock Savior", "Bed-Making Baron", "Tidy Titan", "Dish Dragon"];
 
     let state = {
-      hudson: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [], displayName: "Hudson" },
-      camille: { points: 0, badges: 0, trophies: 0, helmets: 0, titles: [], displayName: "Camille" },
+      heroes: [
+        { id: "h1", displayName: "Hudson", emoji: "🧒", titleSuffix: "the Brave", points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
+        { id: "h2", displayName: "Camille", emoji: "👧", titleSuffix: "the Clever", points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] }
+      ],
       teamBank: 0,
       pending: [],
       teamworkLog: [],
@@ -530,8 +525,38 @@
         var s = localStorage.getItem("hardyHollow");
         if (s) {
           var parsed = JSON.parse(s);
-          state.hudson = parsed.hudson || state.hudson;
-          state.camille = parsed.camille || state.camille;
+          // Migrate old hudson/camille format
+          if (parsed.heroes && parsed.heroes.length) {
+            state.heroes = parsed.heroes;
+          } else if (parsed.hudson || parsed.camille) {
+            state.heroes = [];
+            if (parsed.hudson) {
+              state.heroes.push({
+                id: "h1",
+                displayName: parsed.hudson.displayName || "Hudson",
+                emoji: parsed.hudson.emoji || "🧒",
+                titleSuffix: "the Brave",
+                points: parsed.hudson.points || 0,
+                badges: parsed.hudson.badges || 0,
+                trophies: parsed.hudson.trophies || 0,
+                helmets: parsed.hudson.helmets || 0,
+                titles: parsed.hudson.titles || []
+              });
+            }
+            if (parsed.camille) {
+              state.heroes.push({
+                id: "h2",
+                displayName: parsed.camille.displayName || "Camille",
+                emoji: parsed.camille.emoji || "👧",
+                titleSuffix: "the Clever",
+                points: parsed.camille.points || 0,
+                badges: parsed.camille.badges || 0,
+                trophies: parsed.camille.trophies || 0,
+                helmets: parsed.camille.helmets || 0,
+                titles: parsed.camille.titles || []
+              });
+            }
+          }
           state.teamBank = parsed.teamBank || 0;
           state.pending = parsed.pending || [];
           state.teamworkLog = parsed.teamworkLog || [];
@@ -540,14 +565,30 @@
           state.availableQuests = parsed.availableQuests || [];
         }
       } catch (e) {}
+      if (!state.heroes || !state.heroes.length) {
+        state.heroes = [
+          { id: "h1", displayName: "Hudson", emoji: "🧒", titleSuffix: "the Brave", points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] },
+          { id: "h2", displayName: "Camille", emoji: "👧", titleSuffix: "the Clever", points: 0, badges: 0, trophies: 0, helmets: 0, titles: [] }
+        ];
+      }
+      // Ensure required fields
+      for (var i = 0; i < state.heroes.length; i++) {
+        var h = state.heroes[i];
+        if (!h.id) h.id = "h" + (i + 1) + "-" + Date.now();
+        if (!h.displayName) h.displayName = "Hero " + (i + 1);
+        if (!h.emoji) h.emoji = "⭐";
+        if (!h.titleSuffix) h.titleSuffix = "the Helper";
+        if (typeof h.points !== "number") h.points = 0;
+        if (typeof h.badges !== "number") h.badges = 0;
+        if (typeof h.trophies !== "number") h.trophies = 0;
+        if (typeof h.helmets !== "number") h.helmets = 0;
+        if (!h.titles) h.titles = [];
+      }
       if (!state.availableQuests || state.availableQuests.length < 6) {
         state.availableQuests = buildInitialQuests();
         saveState();
       }
       availableQuests = state.availableQuests;
-      // Ensure display names exist (older saves)
-      if (!state.hudson.displayName) state.hudson.displayName = "Hudson";
-      if (!state.camille.displayName) state.camille.displayName = "Camille";
     }
 
     function saveState() {
@@ -557,14 +598,102 @@
     }
 
 
-    function heroName(key) {
-      if (key === "hudson") return state.hudson.displayName || "Hudson";
-      if (key === "camille") return state.camille.displayName || "Camille";
-      return key;
+
+    function updateSplashNames() {
+      var el = document.getElementById("splash-heroes-list");
+      if (!el || !state.heroes) return;
+      var lines = [];
+      for (var i = 0; i < state.heroes.length; i++) {
+        var h = state.heroes[i];
+        lines.push((h.emoji || "⭐") + " " + h.displayName + " " + (h.titleSuffix || "the Helper"));
+      }
+      el.innerHTML = lines.join("<br>");
     }
 
-    function getRank(hero) {
-      var h = state[hero];
+    function getHero(id) {
+      for (var i = 0; i < state.heroes.length; i++) {
+        if (state.heroes[i].id === id) return state.heroes[i];
+      }
+      return null;
+    }
+
+    function heroName(id) {
+      var h = getHero(id);
+      return h ? h.displayName : "Hero";
+    }
+
+    function pickHeroId(promptTitle) {
+      if (!state.heroes.length) return null;
+      if (state.heroes.length === 1) return state.heroes[0].id;
+      var lines = [];
+      for (var i = 0; i < state.heroes.length; i++) {
+        lines.push((i + 1) + ". " + (state.heroes[i].emoji || "") + " " + state.heroes[i].displayName);
+      }
+      var answer = window.prompt((promptTitle || "Choose a hero") + "\n\n" + lines.join("\n") + "\n\nEnter number:");
+      if (answer === null) return null;
+      var n = parseInt(answer, 10);
+      if (isNaN(n) || n < 1 || n > state.heroes.length) {
+        showToast("Invalid choice");
+        return null;
+      }
+      return state.heroes[n - 1].id;
+    }
+
+    function makeHeroId() {
+      return "h" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+    }
+
+    function renderHeroesEditList() {
+      var list = document.getElementById("heroes-edit-list");
+      if (!list) return;
+      var html = "";
+      for (var i = 0; i < state.heroes.length; i++) {
+        var h = state.heroes[i];
+        html += '<div class="hero-edit-row" data-id="' + h.id + '" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg-card);border:2px solid var(--border);border-radius:10px;padding:10px;">';
+        html += '<input type="text" class="edit-emoji" maxlength="4" value="' + (h.emoji || "⭐").replace(/"/g, "&quot;") + '" style="width:56px;padding:8px;text-align:center;background:var(--bg-dark);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:1.3rem;" />';
+        html += '<input type="text" class="edit-name" maxlength="16" value="' + (h.displayName || "").replace(/"/g, "&quot;") + '" style="flex:1;min-width:100px;padding:8px;background:var(--bg-dark);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;" />';
+        html += '<input type="text" class="edit-suffix" maxlength="20" value="' + (h.titleSuffix || "the Helper").replace(/"/g, "&quot;") + '" placeholder="the Brave" style="flex:1;min-width:90px;padding:8px;background:var(--bg-dark);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:0.85rem;" />';
+        if (state.heroes.length > 1) {
+          html += '<button type="button" class="pixel-btn danger remove-hero-btn" data-id="' + h.id + '" style="padding:8px 12px;font-size:0.8rem;">Remove</button>';
+        }
+        html += "</div>";
+      }
+      list.innerHTML = html;
+      var removes = list.querySelectorAll(".remove-hero-btn");
+      for (var r = 0; r < removes.length; r++) {
+        removes[r].addEventListener("click", function () {
+          var id = this.getAttribute("data-id");
+          if (state.heroes.length <= 1) {
+            showToast("Keep at least one hero");
+            return;
+          }
+          var h = getHero(id);
+          if (!window.confirm("Remove " + (h ? h.displayName : "this hero") + "?")) return;
+          state.heroes = state.heroes.filter(function (x) { return x.id !== id; });
+          // Drop pending for removed hero
+          state.pending = state.pending.filter(function (p) { return p.hero !== id; });
+          saveState();
+          renderHeroesEditList();
+          refreshTitleHeroSelect();
+          updateSplashNames();
+          updateUI();
+          showToast("Hero removed");
+        });
+      }
+    }
+
+    function refreshTitleHeroSelect() {
+      var sel = document.getElementById("title-hero");
+      if (!sel) return;
+      var html = "";
+      for (var i = 0; i < state.heroes.length; i++) {
+        html += '<option value="' + state.heroes[i].id + '">' + state.heroes[i].displayName + "</option>";
+      }
+      sel.innerHTML = html;
+    }
+
+    function getRank(h) {
+      if (!h) return "Hardy Helper";
       if (h.helmets >= 3) return "Hardy Hollow Legend";
       if (h.helmets >= 1) return "Hall-of-Fame Hero";
       if (h.trophies >= 1) return "Household Hero";
@@ -572,8 +701,8 @@
       return "Hardy Helper";
     }
 
-    function getProgress(hero) {
-      var h = state[hero];
+    function getProgress(h) {
+      if (!h) return { pct: 0, next: "Helpful Hero Badge" };
       var toward = h.points % 1000;
       var pct = (toward / 1000) * 100;
       var next = "Helpful Hero Badge";
@@ -584,8 +713,8 @@
       return { pct: pct, next: next };
     }
 
-    function checkMilestones(hero) {
-      var h = state[hero];
+    function checkMilestones(h) {
+      if (!h) return [];
       var msgs = [];
       var expected = Math.floor(h.points / 1000);
       while (h.badges < expected) {
@@ -629,28 +758,39 @@
         }
       }
 
-      var heroes = ["hudson", "camille"];
-      for (var j = 0; j < heroes.length; j++) {
-        var hero = heroes[j];
-        var h = state[hero];
-        var nameEl = document.getElementById(hero + "-display-name");
-        if (nameEl) nameEl.textContent = h.displayName || heroName(hero);
-        document.getElementById(hero + "-points").textContent = h.points.toLocaleString();
-        document.getElementById(hero + "-title").textContent = getRank(hero);
-        var prog = getProgress(hero);
-        document.getElementById(hero + "-progress").style.width = prog.pct + "%";
-        document.getElementById(hero + "-next").textContent = "Next: " + prog.next;
-        var badgesEl = document.getElementById(hero + "-badges");
-        badgesEl.innerHTML = "";
-        if (h.badges) badgesEl.innerHTML += '<span class="badge">Badge x' + h.badges + "</span>";
-        if (h.trophies) badgesEl.innerHTML += '<span class="badge">Trophy x' + h.trophies + "</span>";
-        if (h.helmets) badgesEl.innerHTML += '<span class="badge">Helmet x' + h.helmets + "</span>";
+      var grid = document.getElementById("heroes-grid");
+      if (grid) {
+        var cards = "";
+        for (var j = 0; j < state.heroes.length; j++) {
+          var h = state.heroes[j];
+          var prog = getProgress(h);
+          var badgesHtml = "";
+          if (h.badges) badgesHtml += '<span class="badge">Badge x' + h.badges + "</span>";
+          if (h.trophies) badgesHtml += '<span class="badge">Trophy x' + h.trophies + "</span>";
+          if (h.helmets) badgesHtml += '<span class="badge">Helmet x' + h.helmets + "</span>";
+          cards += '<div class="hero-card">';
+          cards += '<div class="hero-avatar">' + (h.emoji || "⭐") + "</div>";
+          cards += '<div class="hero-name">' + h.displayName + " " + (h.titleSuffix || "") + "</div>";
+          cards += '<div class="hero-title">' + getRank(h) + "</div>";
+          cards += '<div class="hero-points">' + h.points.toLocaleString() + " HHP</div>";
+          cards += '<div class="progress-bar"><div class="progress-fill" style="width:' + prog.pct + '%"></div></div>';
+          cards += '<div class="progress-label">Next: ' + prog.next + "</div>";
+          cards += '<div class="badges">' + badgesHtml + "</div>";
+          cards += "</div>";
+        }
+        grid.innerHTML = cards;
       }
 
       var titlesHtml = "";
       for (var t = 0; t < TITLES.length; t++) {
         var title = TITLES[t];
-        var earned = state.hudson.titles.indexOf(title) !== -1 || state.camille.titles.indexOf(title) !== -1;
+        var earned = false;
+        for (var hi = 0; hi < state.heroes.length; hi++) {
+          if (state.heroes[hi].titles && state.heroes[hi].titles.indexOf(title) !== -1) {
+            earned = true;
+            break;
+          }
+        }
         titlesHtml += '<span class="title-chip' + (earned ? " earned" : "") + '">' + title + "</span>";
       }
       document.getElementById("titles-list").innerHTML = titlesHtml;
@@ -766,7 +906,8 @@
       document.getElementById("quest-modal").classList.remove("hidden");
 
       document.getElementById("modal-accept").onclick = function () {
-        var hero = window.confirm("Is " + heroName("hudson") + " doing this quest?\n\nOK = " + heroName("hudson") + "\nCancel = " + heroName("camille")) ? "hudson" : "camille";
+        var hero = pickHeroId("Who is doing this quest?");
+        if (!hero) return;
         state.pending.push({
           questId: questId,
           hero: hero,
@@ -789,14 +930,22 @@
     function approveQuest(index) {
       var p = state.pending[index];
       if (!p) return;
-      var hero = p.hero;
-      state[hero].points += p.points;
+      var heroId = p.hero;
+      var heroObj = getHero(heroId);
+      if (!heroObj) {
+        showToast("Hero not found");
+        state.pending.splice(index, 1);
+        saveState();
+        updateUI();
+        return;
+      }
+      heroObj.points += p.points;
       state.totalHelps++;
       state.regions[p.region] = Math.min(100, (state.regions[p.region] || 0) + (p.type === "boss" ? 40 : 15));
       var teamAdd = p.type === "boss" ? Math.floor(p.points * 0.5) : Math.floor(p.points * 0.25);
       state.teamBank += teamAdd;
-      state.teamworkLog.unshift(heroName(p.hero) + " completed \"" + p.name + "\" (+" + teamAdd + " team)");
-      var msgs = checkMilestones(hero);
+      state.teamworkLog.unshift(heroName(heroId) + ' completed "' + p.name + '" (+' + teamAdd + " team)");
+      var msgs = checkMilestones(heroObj);
       state.pending.splice(index, 1);
 
       // Remove completed quest and spawn a fresh one from the 100+ pool
@@ -815,7 +964,7 @@
 
       saveState();
       updateUI();
-      var msg = "+" + p.points + " HHP to " + heroName(hero) + "!";
+      var msg = "+" + p.points + " HHP to " + heroName(heroId) + "!";
       if (teamAdd) msg += "\n+" + teamAdd + " to Kingdom Bank";
       if (msgs.length) msg += "\n\n" + msgs.join("\n");
       msg += "\n\nA new quest has appeared!";
@@ -823,27 +972,35 @@
     }
 
     function parentPowerUp() {
-      var hero = window.confirm("Award to " + heroName("hudson") + "?\n\nOK = " + heroName("hudson") + "\nCancel = " + heroName("camille")) ? "hudson" : "camille";
+      var heroId = pickHeroId("Award Parent Power-Up to which hero?");
+      if (!heroId) return;
+      var heroObj = getHero(heroId);
+      if (!heroObj) return;
       var amounts = [100, 250, 500, 750, 1000];
       var amount = amounts[Math.floor(Math.random() * amounts.length)];
-      state[hero].points += amount;
+      heroObj.points += amount;
       state.totalHelps++;
-      var msgs = checkMilestones(hero);
+      var msgs = checkMilestones(heroObj);
       saveState();
       updateUI();
-      var msg = "Parent Power-Up! +" + amount + " HHP to " + heroName(hero);
+      var msg = "Parent Power-Up! +" + amount + " HHP to " + heroName(heroId);
       if (msgs.length) msg += "\n" + msgs.join("\n");
       showCelebration("Power-Up!", msg);
     }
 
     function awardTitle() {
-      var hero = document.getElementById("title-hero").value;
+      var heroId = document.getElementById("title-hero").value;
       var title = document.getElementById("title-select").value;
-      if (state[hero].titles.indexOf(title) === -1) {
-        state[hero].titles.push(title);
+      var heroObj = getHero(heroId);
+      if (!heroObj) {
+        showToast("Select a hero");
+        return;
+      }
+      if (heroObj.titles.indexOf(title) === -1) {
+        heroObj.titles.push(title);
         saveState();
         updateUI();
-        showToast("Awarded \"" + title + "\" to " + heroName(hero) + "!");
+        showToast('Awarded "' + title + '" to ' + heroName(heroId) + "!");
       } else {
         showToast("Already has that title!");
       }
@@ -872,21 +1029,14 @@
       document.getElementById("screen-" + name).classList.add("active");
       document.querySelector('.tab[data-screen="' + name + '"]').classList.add("active");
       if (name === "parent") {
-        // Fill name fields when opening parent
-        var eh = document.getElementById("edit-name-hudson");
-        var ec = document.getElementById("edit-name-camille");
-        if (eh) eh.value = state.hudson.displayName || "Hudson";
-        if (ec) ec.value = state.camille.displayName || "Camille";
-        var sel = document.getElementById("title-hero");
-        if (sel && sel.options.length >= 2) {
-          sel.options[0].text = state.hudson.displayName || "Hudson";
-          sel.options[1].text = state.camille.displayName || "Camille";
-        }
+        renderHeroesEditList();
+        refreshTitleHeroSelect();
       }
     }
 
     function init() {
       loadState();
+      updateSplashNames();
       document.getElementById("start-btn").addEventListener("click", function () {
         document.getElementById("splash").classList.add("hidden");
         document.getElementById("app").classList.remove("hidden");
@@ -905,27 +1055,55 @@
       document.getElementById("power-up-btn").addEventListener("click", parentPowerUp);
       document.getElementById("award-title-btn").addEventListener("click", awardTitle);
       document.getElementById("save-names-btn").addEventListener("click", function () {
-        var n1 = (document.getElementById("edit-name-hudson").value || "").trim();
-        var n2 = (document.getElementById("edit-name-camille").value || "").trim();
-        if (!n1) n1 = "Hudson";
-        if (!n2) n2 = "Camille";
-        // Limit length
-        if (n1.length > 16) n1 = n1.slice(0, 16);
-        if (n2.length > 16) n2 = n2.slice(0, 16);
-        state.hudson.displayName = n1;
-        state.camille.displayName = n2;
-        // Update title dropdown labels
-        var sel = document.getElementById("title-hero");
-        if (sel && sel.options.length >= 2) {
-          sel.options[0].text = n1;
-          sel.options[1].text = n2;
+        var rows = document.querySelectorAll("#heroes-edit-list .hero-edit-row");
+        for (var i = 0; i < rows.length; i++) {
+          var id = rows[i].getAttribute("data-id");
+          var h = getHero(id);
+          if (!h) continue;
+          var em = rows[i].querySelector(".edit-emoji");
+          var nm = rows[i].querySelector(".edit-name");
+          var su = rows[i].querySelector(".edit-suffix");
+          var emoji = (em && em.value ? em.value : "").trim() || "⭐";
+          var name = (nm && nm.value ? nm.value : "").trim() || ("Hero " + (i + 1));
+          var suffix = (su && su.value ? su.value : "").trim() || "the Helper";
+          if (name.length > 16) name = name.slice(0, 16);
+          if (suffix.length > 20) suffix = suffix.slice(0, 20);
+          h.emoji = emoji;
+          h.displayName = name;
+          h.titleSuffix = suffix;
         }
+        refreshTitleHeroSelect();
+        updateSplashNames();
         saveState();
         updateUI();
-        showToast("Names saved: " + n1 + " & " + n2);
+        showToast("Heroes saved");
+      });
+
+      document.getElementById("add-hero-btn").addEventListener("click", function () {
+        if (state.heroes.length >= 6) {
+          showToast("Maximum 6 heroes");
+          return;
+        }
+        state.heroes.push({
+          id: makeHeroId(),
+          displayName: "New Hero",
+          emoji: "⭐",
+          titleSuffix: "the Helper",
+          points: 0,
+          badges: 0,
+          trophies: 0,
+          helmets: 0,
+          titles: []
+        });
+        saveState();
+        renderHeroesEditList();
+        refreshTitleHeroSelect();
+        updateSplashNames();
+        updateUI();
+        showToast("Hero added — edit name & emoji, then Save");
       });
       document.getElementById("reset-btn").addEventListener("click", function () {
-        if (window.confirm("Reset all demo data?")) {
+        if (window.confirm("Reset all demo data?\n\nThis cannot be undone.\n\nOK = Reset\nCancel = Keep data")) {
           localStorage.removeItem("hardyHollow");
           location.reload();
         }
@@ -940,7 +1118,8 @@
         var name = window.prompt("Quest name:");
         if (!name) return;
         var points = parseInt(window.prompt("Points (e.g. 500):") || "500", 10);
-        var hero = window.confirm("For " + heroName("hudson") + "?\nOK = " + heroName("hudson") + ", Cancel = " + heroName("camille")) ? "hudson" : "camille";
+        var hero = pickHeroId("Custom quest for which hero?");
+        if (!hero) return;
         state.pending.push({
           questId: "custom-" + Date.now(),
           hero: hero,
